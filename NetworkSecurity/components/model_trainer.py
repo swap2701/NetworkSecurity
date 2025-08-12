@@ -21,6 +21,12 @@ from sklearn.ensemble import (RandomForestClassifier,
                               GradientBoostingClassifier)
 
 import mlflow
+import joblib
+
+
+
+import dagshub
+dagshub.init(repo_owner='swapniltomar27', repo_name='NetworkSecurity', mlflow=True)
 
 
 class ModelTrainer:
@@ -41,7 +47,11 @@ class ModelTrainer:
             mlflow.log_metric("precision_score",precision_score)
             mlflow.log_metric("recall_score",recall_score)
 
-            mlflow.sklearn.log_model(best_model,"model")
+            # Save model locally
+            joblib.dump(best_model, "best_model.pkl")
+
+            # Log model file as an artifact in MLflow
+            mlflow.log_artifact("best_model.pkl")
 
         
     def train_model(self,x_train,y_train,x_test,y_test):
@@ -118,6 +128,7 @@ class ModelTrainer:
         Network_Model=NetworkModel(preprocessor=preprocessor,model=best_model)
         save_object(self.model_trainer_config.trained_model_file_path,obj=NetworkModel)
 
+        save_object("final_model/model.pkl",best_model)
 
         ### Model trainer Artifact
 
